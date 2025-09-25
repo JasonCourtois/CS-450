@@ -78,34 +78,38 @@
 (define (extreme-from comparison n l)
     (match l
         [(list) n]  ;; Base case, if we have an empty list the extreme is n
-        [(list h l ...)
-            (comparison h (extreme-from comparison n l))])) ;; Otherwise, compare h with the extreme result from the rest of the list.
+        [(cons h l)
+            (define result (extreme-from comparison n l))
+            (comparison h result)]))    ;; Otherwise, compare h with the extreme result from the rest of the list.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Exercise 6
 (define (count l)
     (match l
         [(list) 0]  ;; Base case, list empty therefore there are 0 items.
-        [(list h l ...)
-            (+ 1 (count l))]))  ;; Otherwise, add 1 plus the result of count on the rest of the list.
+        [(cons h l)
+            (define result (count l))
+            (+ 1 result)]))  ;; Otherwise, add 1 plus the result of count on the rest of the list.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Exercise 7
 (define (sum l)
     (match l
         [(list) 0]  ;; Base case, list empty therefore add 0 to the summation.
-        [(list h l ...)
-            (+ h (sum l))]))    ;; Otherwise, add the value of current item to the sum of the rest of the list.
+        [(cons h l)
+            (define result (sum l))
+            (+ h result)]))    ;; Otherwise, add the value of current item to the sum of the rest of the list.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Exercise 8
 (define (occurrences x l)
     (match l
         [(list) 0]  ;; Base case, list empty therefore add 0 to number of occurrences.
-        [(list h l ...)
+        [(cons h l)
+            (define result (occurrences x l))
             (cond
-                [(= x h) (+ 1 (occurrences x l))]   ;; If current item h is equal to x, add 1 to the rest of the occurrences.
-                [else (occurrences x l)])]))    ;; Otherwise, return the number of occurrences in the rest of the list.
+                [(= x h) (+ 1 result)]   ;; If current item h is equal to x, add 1 to the rest of the occurrences.
+                [else result])]))    ;; Otherwise, return the number of occurrences in the rest of the list.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Exercise 9
