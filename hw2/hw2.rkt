@@ -9,6 +9,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Exercise 1
+;; Make struct transparent so we can easily see the contents of the struct.
 (struct pair (left right) #:transparent)
 
 ;; Exercise 1.a
@@ -42,8 +43,8 @@
     ;; Inside constructor for name is a lambda that takes a selection to find the first or last name.
     (lambda (selection) 
         (match selection
-            ['first first]
-            ['last last])))
+            ['first first]  ;; Accessor will pass in symbol 'first to access first name
+            ['last last]))) ;; Accessor will pass in symbol 'last to access last name
 
 ;; Exercise 2.b
 (define (first-name p) (p 'first))
@@ -64,15 +65,6 @@
         (substring (last-name p ) 0 1)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Exercise 5: Reusable function for Exercises 3 and 4.
-;; Comparison will either be max or min which are input in exercises 3 and 4.
-(define (extreme-from comparison n l)
-    (match l
-        [(list) n]  ;; Base case, if we have an empty list the extreme is n
-        [(list h l ...)
-            (comparison h (extreme-from comparison n l))])) ;; Otherwise, compare h with the extreme result from the rest of the list.
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Exercise 3
 (define (max-from n l) (extreme-from max n l))
 
@@ -81,12 +73,21 @@
 (define (min-from n l) (extreme-from min n l))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Exercise 5: Reusable function for Exercises 3 and 4 - Finds the extreme (max or min) from a list.
+;; Comparison will either be max or min which are input in exercises 3 and 4.
+(define (extreme-from comparison n l)
+    (match l
+        [(list) n]  ;; Base case, if we have an empty list the extreme is n
+        [(list h l ...)
+            (comparison h (extreme-from comparison n l))])) ;; Otherwise, compare h with the extreme result from the rest of the list.
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Exercise 6
 (define (count l)
     (match l
         [(list) 0]  ;; Base case, list empty therefore there are 0 items.
         [(list h l ...)
-            (+ 1 (count l))]))
+            (+ 1 (count l))]))  ;; Otherwise, add 1 plus the result of count on the rest of the list.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Exercise 7
