@@ -64,37 +64,54 @@
         (substring (last-name p ) 0 1)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Exercise 3
-(define (max-from n l)
+;; Exercise 5: Reusable function for Exercises 3 and 4.
+;; Comparison will either be max or min which are input in exercises 3 and 4.
+(define (extreme-from comparison n l)
     (match l
-        [(list) n]
+        [(list) n]  ;; Base case, if we have an empty list the extreme is n
         [(list h l ...)
-            (max h (max-from n l))]))
+            (comparison h (extreme-from comparison n l))])) ;; Otherwise, compare h with the extreme result from the rest of the list.
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Exercise 3
+(define (max-from n l) (extreme-from max n l))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Exercise 4
-(define (min-from n l)
-    (match l
-        [(list) n]
-        [(list h l ...)
-            (min h (min-from n l))]))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Exercise 5: revisit Exercise 3 and Exercise 4
+(define (min-from n l) (extreme-from min n l))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Exercise 6
-(define (count l) 'todo)
+(define (count l)
+    (match l
+        [(list) 0]  ;; Base case, list empty therefore there are 0 items.
+        [(list h l ...)
+            (+ 1 (count l))]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Exercise 7
-(define (sum l) 'todo)
+(define (sum l)
+    (match l
+        [(list) 0]  ;; Base case, list empty therefore add 0 to the summation.
+        [(list h l ...)
+            (+ h (sum l))]))    ;; Otherwise, add the value of current item to the sum of the rest of the list.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Exercise 8
-(define (occurrences x l) 'todo)
+(define (occurrences x l)
+    (match l
+        [(list) 0]  ;; Base case, list empty therefore add 0 to number of occurrences.
+        [(list h l ...)
+            (cond
+                [(= x h) (+ 1 (occurrences x l))]   ;; If current item h is equal to x, add 1 to the rest of the occurrences.
+                [else (occurrences x l)])]))    ;; Otherwise, return the number of occurrences in the rest of the list.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Exercise 9
-(define (norm l) 'todo)
 
+;; Helper function to square an input
+(define (square x) (* x x))
+
+(define (norm l)
+    ;; Square every element in list with map, then use the above sum pattern matching to add all items, then take the square root of the sum.
+    (sqrt (sum (map square l))))
