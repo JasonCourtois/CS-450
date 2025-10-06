@@ -233,11 +233,11 @@
     test-5
     test-6
     test-7
-    ; test-8-1
-    ; test-8-2
-    ; test-8-3
-    ; test-8-4
-    ; test-8-5
+    test-8-1
+    test-8-2
+    test-8-3
+    test-8-4
+    test-8-5
   )
 )
 

@@ -62,22 +62,69 @@
 ;; Do not check for the last element, should be checking only for the first element.
 (define (intersperse l v) 
   (cond 
-    [(<= (length l) 1) l]
+    [(<= (length l) 1) l] ;; If list has 0 or 1 items, return the list itself.
     [else 
-      (cons
-        (first l)
-        (foldl (lambda (nextItem total) (cons (cons v nextItem) total)) (list) l))]))
-
-(intersperse (list 1 2 3) 0 )
+        (foldr 
+          (lambda (nextItem total) 
+            (cond
+              [(= 0 (length total))
+                (list nextItem)]  ;; If the current total is empty, create a list with just the last item in the list.
+              [else
+                (cons nextItem (cons v total))])) ;; (cons v total) adds the separator to the front of the running list. Then put the next item in front of that.
+          (list) l)]))
 
 ;; Exercise 8
 (define (parse-ast node)
-  (define (make-define-func node) 'todo)
-  (define (make-define-basic node) 'todo)
-  (define (make-lambda node) 'todo)
-  (define (make-apply node) 'todo)
-  (define (make-number node) 'todo)
-  (define (make-variable node) 'todo)
+  (define (make-define-func node)
+    (define function (first (second node)))
+    (define parsed-function (parse-ast function))
+    
+    (define arguments (rest (second node)))
+    (define parsed-arguments (map parse-ast arguments))
+    
+    (define body (rest (rest node)))
+    (define parsed-body (map parse-ast body))
+
+    (r:define parsed-function (r:lambda parsed-arguments parsed-body))
+    )
+
+  (define (make-define-basic node)
+    ;; Get the name of the variable and parse it.
+    (define name (first node))
+    (define parsed-name (parse-ast name))
+    ;; Get the value of the variable and parse it.
+    (define value (second node))
+    (define parsed-value (parse-ast value))
+    ;; Create define AST node.
+    (r:define parsed-name parsed-value))
+
+  (define (make-lambda node)
+    ;; Get list of arguments, and then use map to parse each one.
+    (define arguments (second node))
+    (define parsed-arguments (map parse-ast arguments))
+    ;; Get list of body statements, and then use map to parse each one.
+    (define body (rest (rest node)))
+    (define parsed-body (map parse-ast body))
+    ;; Create lambda AST node.
+    (r:lambda parsed-arguments parsed-body))
+
+  (define (make-apply node)
+    ;; Get name of function and parse it.
+    (define function (first node))
+    (define parsed-function (parse-ast function)))
+    ;; Get list of arguments, and then use map to parse each one.
+    (define arguments (rest node))
+    (define parsed-arguments (map parse-ast arguments))
+    ;; Create apply AST node.
+    (r:apply parsed-function parsed-arguments)
+
+  (define (make-number node)
+    ;; Create a number using the node input which should be a number like 'x
+    (r:number node))
+
+  (define (make-variable node)
+    ;; Create a variable using the node input which should be a symbol like 'x
+    (r:variable node))
 
   ;; Don't change the below functions
   (cond
