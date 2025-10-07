@@ -85,24 +85,25 @@
 ;; Exercise 8
 (define (parse-ast node)
   (define (make-define-func node)
+    ;; Get function which is the first item within the second item in list, then parse it.
     (define function (first (second node)))
     (define parsed-function (parse-ast function))
-    
+    ;; Get the arguments of the function which is the rest of the second item in list, then parse them.
     (define arguments (rest (second node)))
     (define parsed-arguments (map parse-ast arguments))
-    
+    ;; Lastly, the body starts at the 3rd item in the list, so take (rest (rest node)) to get and parse them.
     (define body (rest (rest node)))
     (define parsed-body (map parse-ast body))
-
+    ;; Create define function AST node.
     (r:define parsed-function (r:lambda parsed-arguments parsed-body))
     )
 
   (define (make-define-basic node)
     ;; Get the name of the variable and parse it.
-    (define name (first node))
+    (define name (second node))
     (define parsed-name (parse-ast name))
     ;; Get the value of the variable and parse it.
-    (define value (second node))
+    (define value (third node))
     (define parsed-value (parse-ast value))
     ;; Create define AST node.
     (r:define parsed-name parsed-value))
