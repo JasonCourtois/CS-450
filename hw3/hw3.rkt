@@ -22,13 +22,19 @@
 (define (count l) 
   ;; Calls foldl with a lambda that accepts the next item and the running total.
   ;; The next item is unused as we only need the count, so 1 is added to the running total.
-  (foldl (lambda (nextItem total) (+ total 1)) 0 l))
+  (foldl 
+    (lambda (nextItem total) (+ total 1))
+    ;; Initial value and list.
+    0 l))
 
 ;; Exercise 3
 (define (sum l) 
   ;; Calls foldl with a lambda that accepts the next item and the running total - like the last problem.
   ;; However here instead of adding 1, I add the value of the next item in the list.
-  (foldl (lambda (nextItem total) (+ nextItem total)) 0 l))
+  (foldl 
+    (lambda (nextItem total) (+ nextItem total))
+    ;; Initial value and list.
+    0 l))
 
 ;; Exercise 4
 (define (occurrences n l) 
@@ -38,8 +44,8 @@
       (cond 
         [(= n nextItem) (+ total 1)]  ;; Increment total if nextItem is equal to n.
         [else total]))  ;; Otherwise, return the existing total.
-      ;; foldl arguments.
-      0 l))
+    ;; Initial value and list.
+    0 l))
 
 ;; Exercise 5
 (define (prefix s l)
@@ -56,18 +62,17 @@
       l2] ;; If the first list is empty, then return the second list.
     [(list h1 l1 ...)
       (define result (interleave l2 l1))  ;; Call recursively with flipped list order. 
-      (cons h1 result)]))  ;; Add h1 to list followed by result of the recursive call.
+      (cons h1 result)]))  ;; Add first item from first list followed by result of the recursive call.
 
 ;; Exercise 7
 ;; Do not check for the last element, should be checking only for the first element.
 (define (intersperse l v) 
   (match l
-    ;; If list has 0 or 1 items, then return the list itself.
+    ;; If list has 0 items, then return the list itself.
     [(list) l]
-    [(list h) l]
     ;; This match essentially removes the first item from the list - this gets added at the end.
     [(list h l ...)
-      ;; listTail will contain everything besides the first item. Must use foldr because cons adds to the front.
+      ;; listTail will contain everything besides the first item. Must use foldr because cons adds to the front.  
       (define listTail 
         (foldr 
           (lambda (nextItem total) 
@@ -95,8 +100,7 @@
     (define body (rest (rest node)))
     (define parsed-body (map parse-ast body))
     ;; Create define function AST node.
-    (r:define parsed-function (r:lambda parsed-arguments parsed-body))
-    )
+    (r:define parsed-function (r:lambda parsed-arguments parsed-body)))
 
   (define (make-define-basic node)
     ;; Get the name of the variable and parse it.
