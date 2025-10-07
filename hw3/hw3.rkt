@@ -24,7 +24,7 @@
   ;; The next item is unused as we only need the count, so 1 is added to the running total.
   (foldl 
     (lambda (nextItem total) (+ total 1))
-    ;; Initial value and list.
+    ;; Set initial value to 0 with list argument for foldl.
     0 l))
 
 ;; Exercise 3
@@ -33,7 +33,7 @@
   ;; However here instead of adding 1, I add the value of the next item in the list.
   (foldl 
     (lambda (nextItem total) (+ nextItem total))
-    ;; Initial value and list.
+    ;; Set initial value to 0 with list argument for foldl.
     0 l))
 
 ;; Exercise 4
@@ -44,7 +44,7 @@
       (cond 
         [(= n nextItem) (+ total 1)]  ;; Increment total if nextItem is equal to n.
         [else total]))  ;; Otherwise, return the existing total.
-    ;; Initial value and list.
+    ;; Set initial value to 0 with list argument for foldl.
     0 l))
 
 ;; Exercise 5
@@ -70,7 +70,7 @@
   (match l
     ;; If list has 0 items, then return the list itself.
     [(list) l]
-    ;; This match essentially removes the first item from the list - this gets added at the end.
+    ;; This case essentially removes the first item from the list - this gets added at the end.
     [(list h l ...)
       ;; listTail will contain everything besides the first item. Must use foldr because cons adds to the front.  
       (define listTail 
