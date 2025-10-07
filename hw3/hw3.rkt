@@ -61,17 +61,26 @@
 ;; Exercise 7
 ;; Do not check for the last element, should be checking only for the first element.
 (define (intersperse l v) 
-  (cond 
-    [(<= (length l) 1) l] ;; If list has 0 or 1 items, return the list itself.
-    [else 
+  (match l
+    ;; If list has 0 or 1 items, then return the list itself.
+    [(list) l]
+    [(list h) l]
+    ;; This match essentially removes the first item from the list - this gets added at the end.
+    [(list h l ...)
+      ;; listTail will contain everything besides the first item. Must use foldr because cons adds to the front.
+      (define listTail 
         (foldr 
           (lambda (nextItem total) 
-            (cond
-              [(= 0 (length total))
-                (list nextItem)]  ;; If the current total is empty, create a list with just the last item in the list.
-              [else
-                (cons nextItem (cons v total))])) ;; (cons v total) adds the separator to the front of the running list. Then put the next item in front of that.
-          (list) l)]))
+            (match total
+              ;; If total is empty, add the last item in the list and a separator.
+              [(list) (list v nextItem)]
+              ;; Otherwise, add the next item to the total followed by a separator.
+              [(list h l ...) 
+                (cons v (cons nextItem total))])) 
+          (list) 
+          l))
+      ;; Add the first item to the front of the list and return it.
+      (cons h listTail)]))
 
 ;; Exercise 8
 (define (parse-ast node)
@@ -111,12 +120,12 @@
   (define (make-apply node)
     ;; Get name of function and parse it.
     (define function (first node))
-    (define parsed-function (parse-ast function)))
+    (define parsed-function (parse-ast function))
     ;; Get list of arguments, and then use map to parse each one.
     (define arguments (rest node))
     (define parsed-arguments (map parse-ast arguments))
     ;; Create apply AST node.
-    (r:apply parsed-function parsed-arguments)
+    (r:apply parsed-function parsed-arguments))
 
   (define (make-number node)
     ;; Create a number using the node input which should be a number like 'x
