@@ -28,7 +28,22 @@
   )
 )
 (define (stream-skip n s)
-  (error "todo")
+  (: loop (-> Real (stream Elem) (stream Elem)))
+  (define (loop counter s)
+    ;; Match the stream to extract the head item from stream.
+    (match (s)
+      [(stream-add h s)
+        (cond
+          ;; If the counter is less than the skip item input n, return the rest of the stream and increment counter.
+          [(< counter n)
+            (loop (+ counter 1) s)]
+          ;; Otherwise, return a stream object by making a lambda with stream add for a return value.
+          [else
+            (lambda () (stream-add h s))])  
+      ]
+    )
+  )
+  (loop 0 s)
 )
 
 
@@ -50,55 +65,63 @@
   )
 )
 (define (stream-fold f a s)
-  (error "todo")
-)
-
-(: set-void set)
-(define set-void
-  'todo
-)
-
-(: set-epsilon set)
-(define set-epsilon
-  'todo
-)
-
-(: set-char (-> Char set))
-(define (set-char x)
-  (error "todo")
-)
-
-
-(: set-prefix (-> String set set))
-(define (set-prefix s p)
-  (error "todo")
-)
-
-(: set-union (-> set set set ))
-(define (set-union p1 p2)
-  (error "todo")
-)
-
-(: set-concat (-> set set set))
-(define (set-concat p1 p2)
-  (error "todo")
-)
-
-(: r:eval-exp (-> r:expression Number))
-(define (r:eval-exp exp)
-  (match exp
-    ; If it's a number, return that number
-    [(r:number v) v]
-    ; If it's a function with 2 arguments
-    [(r:apply (r:variable f) (list arg1 arg2))
-      (define func (r:eval-builtin f))
-      (func (r:eval-exp arg1) (r:eval-exp arg2))
-    ]
+  (lambda () 
+    (match (s)
+      [(stream-add h s)
+        (define newAcc (f h a)) ;; Compute the new accumulator.
+        (define result (stream-fold f newAcc s))  ;; Compute the next stream item with new accumulator.
+        (stream-add a result) ;; Return a stream-add with the first item being the current accumulator, and the rest being the new steam.
+      ]
+    )
   )
 )
 
-(: r:exp-to-string (-> r:expression String))
-(define (r:exp-to-string exp)
-  (error "todo")
-)
+; (: set-void set)
+; (define set-void
+;   'todo
+; )
+
+; (: set-epsilon set)
+; (define set-epsilon
+;   'todo
+; )
+
+; (: set-char (-> Char set))
+; (define (set-char x)
+;   (error "todo")
+; )
+
+
+; (: set-prefix (-> String set set))
+; (define (set-prefix s p)
+;   (error "todo")
+; )
+
+; (: set-union (-> set set set ))
+; (define (set-union p1 p2)
+;   (error "todo")
+; )
+
+; (: set-concat (-> set set set))
+; (define (set-concat p1 p2)
+;   (error "todo")
+; )
+
+; (: r:eval-exp (-> r:expression Number))
+; (define (r:eval-exp exp)
+;   (match exp
+;     ; If it's a number, return that number
+;     [(r:number v) v]
+;     ; If it's a function with 2 arguments
+;     [(r:apply (r:variable f) (list arg1 arg2))
+;       (define func (r:eval-builtin f))
+;       (func (r:eval-exp arg1) (r:eval-exp arg2))
+;     ]
+;   )
+; )
+
+; (: r:exp-to-string (-> r:expression String))
+; (define (r:exp-to-string exp)
+;   (error "todo")
+; )
 
