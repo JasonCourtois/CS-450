@@ -28,9 +28,18 @@
   )
 )
 (define (stream-skip n s)
-  (: loop (-> Real (stream Elem) (stream Elem)))
+  (: loop 
+    (-> 
+      ;; Real input for the counter.
+      Real
+      ;; Takes an input for stream of elements.
+      (stream Elem)
+      ;; Outputs a stream of elements of the same type as input.
+      (stream Elem)
+    )
+  )
   (define (loop counter s)
-    ;; Match the stream to extract the head item from stream.
+    ;; Match the stream to extract the head item from rest of stream.
     (match (s)
       [(stream-add h s)
         (cond
@@ -43,6 +52,7 @@
       ]
     )
   )
+  ;; Call the loop function with counter initialized to 0.
   (loop 0 s)
 )
 
