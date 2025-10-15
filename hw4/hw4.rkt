@@ -28,33 +28,33 @@
   )
 )
 (define (stream-skip n s)
+  (: loop 
+    (-> 
+      ;; Real input for the counter.
+      Real
+      ;; Takes an input for stream of elements.
+      (stream Elem)
+      ;; Outputs a stream-add of elements of the same type as input.
+      ;; This will eventually get returned as a stream as this loop function is surrounded by a lambda with no arguments. 
+      (stream-add Elem)
+    )
+  )
+  (define (loop counter s)
+    ;; Match the stream to extract the head item from rest of stream.
+    (match (s)
+      [(stream-add h s)
+        (cond
+          ;; If the counter is less than the skip item input n, return the rest of the stream and increment counter.
+          [(< counter n)
+            (loop (+ counter 1) s)]
+          ;; Otherwise, return a stream-add object.
+          [else
+            (stream-add h s)])  
+      ]
+    )
+  )
   (lambda ()
-    (: loop 
-      (-> 
-        ;; Real input for the counter.
-        Real
-        ;; Takes an input for stream of elements.
-        (stream Elem)
-        ;; Outputs a stream-add of elements of the same type as input.
-        ;; This will eventually get returned as a stream as this loop function is surrounded by a lambda with no arguments. 
-        (stream-add Elem)
-      )
-    )
-    (define (loop counter s)
-      ;; Match the stream to extract the head item from rest of stream.
-      (match (s)
-        [(stream-add h s)
-          (cond
-            ;; If the counter is less than the skip item input n, return the rest of the stream and increment counter.
-            [(< counter n)
-              (loop (+ counter 1) s)]
-            ;; Otherwise, return a stream-add object.
-            [else
-              (stream-add h s)])  
-        ]
-      )
-    )
-    ;; Call the loop function with counter initialized to 0.
+    ;; Call the loop function with counter initialized to 0 inside a lambda.
     (loop 0 s)
   )
 )
@@ -146,24 +146,48 @@
 
 (: set-concat (-> set set set))
 (define (set-concat p1 p2)
-  (error "todo")
-)
+  (lambda () 
+    (match (p1)
+      [(set-empty) (set-empty)] ;; If p1 is empty, return empty set.
+      [(set-add h p1)
+        ;; Create a set where the head of p1 is a prefix of everything from p2.
+        (define concatSet (set-prefix h p2))
+        ;; Get the result of set-concat on the rest of p1.
+        (define result (set-concat p1 p2))
+        ;; Generate the output set by taking the union of the prefix set and recursive result.
+        (define outputSet (set-union concatSet result))
+        ;; Call the outputSet lambda because the output of set-union is a function that returns a set.
+        (outputSet)
+      ]  
+    )
+  )
+)      
 
 (: r:eval-exp (-> r:expression Number))
 (define (r:eval-exp exp)
   (match exp
     ; If it's a number, return that number
     [(r:number v) v]
-    ; If it's a function with 2 arguments
-    [(r:apply (r:variable f) (list arg1 arg2))
-      (define func (r:eval-builtin f))
-      (func (r:eval-exp arg1) (r:eval-exp arg2))
+    ; If it's a function with any number of arguments.
+    [(r:apply (r:variable f) l)
+      (define func (r:eval-builtin f))  ;; Evaluate the function
+      (define evaluatedList (map r:eval-exp l)) ;; apply eval-exp to every item in the list of arguments.
+      (apply func evaluatedList)  ;; Use apply to execute the function with the list of arguments.
     ]
   )
 )
 
 (: r:exp-to-string (-> r:expression String))
 (define (r:exp-to-string exp)
-  (error "todo")
+  (match exp
+    ;; Cases for r:number and r:variable both just return a string representation of the number or variable.
+    [(r:number v) (format "~a" v)]
+    [(r:variable v) (format "~a" v)]
+    [(r:apply f l)
+      ;; evaluated list has a string of the function call followed by string representations of each argument.
+      (define evaluatedList (cons (r:exp-to-string f) (map r:exp-to-string l)))
+      ;; Format handles adding parenthesis around the list, which represents the function call, and putting a space between each element.
+      (format "~a" evaluatedList)]
+  )
 )
 
