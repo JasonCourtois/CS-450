@@ -30,9 +30,9 @@
 (define (stream-skip n s)
   (: loop 
     (-> 
-      ;; Real input for the counter.
+      ;; First input is Real for the counter.
       Real
-      ;; Takes an input for stream of elements.
+      ;; Second input is the stream of elements.
       (stream Elem)
       ;; Outputs a stream-add of elements of the same type as input.
       ;; This will eventually get returned as a stream as this loop function is surrounded by a lambda with no arguments. 
@@ -47,7 +47,7 @@
           ;; If the counter is less than the skip item input n, return the rest of the stream and increment counter.
           [(< counter n)
             (loop (+ counter 1) s)]
-          ;; Otherwise, return a stream-add object.
+          ;; Otherwise, we have skipped enough items so return a stream-add object.
           [else
             (stream-add h s)])  
       ]
@@ -156,7 +156,9 @@
         (define result (set-concat p1 p2))
         ;; Generate the output set by taking the union of the prefix set and recursive result.
         (define outputSet (set-union concatSet result))
-        ;; Call the outputSet lambda because the output of set-union is a function that returns a set.
+        ;; Call outputSet because the output of set-union is a function that returns a set.
+        ;; If we didn't call outputSet, The output would be a function that returns a function that returns a set.
+        ;; This removes the middle function call.
         (outputSet)
       ]  
     )
@@ -166,12 +168,12 @@
 (: r:eval-exp (-> r:expression Number))
 (define (r:eval-exp exp)
   (match exp
-    ; If it's a number, return that number
+    ; If it's a number, return that number.
     [(r:number v) v]
-    ; If it's a function with any number of arguments.
+    ; Case for applying a function.
     [(r:apply (r:variable f) l)
-      (define func (r:eval-builtin f))  ;; Evaluate the function
-      (define evaluatedList (map r:eval-exp l)) ;; apply eval-exp to every item in the list of arguments.
+      (define func (r:eval-builtin f))  ;; Get the specified function.
+      (define evaluatedList (map r:eval-exp l)) ;; Use map to compute eval-exp on every item in the list of arguments.
       (apply func evaluatedList)  ;; Use apply to execute the function with the list of arguments.
     ]
   )
@@ -186,7 +188,7 @@
     [(r:apply f l)
       ;; evaluated list has a string of the function call followed by string representations of each argument.
       (define evaluatedList (cons (r:exp-to-string f) (map r:exp-to-string l)))
-      ;; Format handles adding parenthesis around the list, which represents the function call, and putting a space between each element.
+      ;; Format handles adding parenthesis around the entire list, which represents the function call, and putting a space between each element.
       (format "~a" evaluatedList)]
   )
 )
