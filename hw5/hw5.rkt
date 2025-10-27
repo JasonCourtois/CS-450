@@ -102,7 +102,7 @@
 ;; Exercise 4 (Manually graded)
 #|
 One situation where λS would be a better alternative to λE would be in a teaching environment such as this class. 
-The idea of directly substituting variables with their values at each step helps clarify the scope of variables within function calls. 
+The idea of directly substituting variables with their values at each step helps clarify concepts like the scope of variables within function calls. 
 This can be ideal in a teaching environment because no other data structures like a map or lookup table are needed. 
 However, this implementation has the problem of having a runtime of O(n). 
 This is because every expression in a function’s body needs to be evaluated for substitution.
