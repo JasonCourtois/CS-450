@@ -28,25 +28,31 @@
       (eff mem exp)
       ]
     [(? d:variable?) ; exp is x  and H is mem
-      (error "todo!")
       ; Return: E(x) ▶ H
+      (eff mem (environ-get mem env exp))
     ]
     [(d:lambda x t) ; H is mem
-      (error "todo!")
       ; Return: {E, λx.t} ▶ H
+      (eff mem (d:closure env x t))
     ]
     [(d:apply ef ea) ; H1 is mem
       (match (eval-exp mem env ef)
         ;; ef ⇓E {Ef, λx.tb} ▶ H2
         [(eff H2 (d:closure Ef x tb))
           ;; ea ⇓E va ▶ H3
-          ;; ...
+          (define va+H3 (eval-exp H2 env ea))
+          (define H3 (eff-state va+H3))
+          (define va (eff-result va+H3))
           ;; Eb ← Ef + [x := va] ▶ H4
-          ;; ...
+          (define Eb+H4 (environ-push H3 Ef x va))
+          (define Eb (eff-result Eb+H4))
+          (define H4 (eff-state Eb+H4))
           ;; tb ⇓Eb vb ▶ H5
-          ;; ...
-          (error "todo!")
+          (define vb+H5 (eval-term H4 Eb tb))
+          (define H5 (eff-state vb+H5))
+          (define vb (eff-result vb+H5))
           ;; Return: vb ▶ H5
+          (eff H5 vb)
         ]
       )
     ]
@@ -60,19 +66,25 @@
   (match term
     [(d:define x e) ; mem is H1
       ;; e ⇓E v ▶ H2
-      ;; ...
+      (define v+H2 (eval-exp mem env e))
+      (define H2 (eff-state v+H2))
+      (define v (eff-result v+H2))
       ;; E ← [x := v] ▶ H3
-      ;; ...
-      (error "todo!")
+      (define H3 (environ-put H2 env x v))
       ;; return: void ▶ H3
+      (eff H3 (d:void))
     ]
     [(d:seq t1 t2) ; mem is H1
       ;; ​t1​ ⇓E ​v1 ▶ H2
-      ;; ...
+      (define v1+H2 (eval-term mem env t1))
+      (define H2 (eff-state v1+H2))
+      (define v1 (eff-result v1+H2))
       ;; t2 ⇓E v2 ▶ H3
-      ;; ...
-      (error "todo!")
+      (define v2+H3 (eval-term H2 env t2))
+      (define H3 (eff-state v2+H3))
+      (define v2 (eff-result v2+H3))
       ;; return: v2 ▶ H3
+      (eff H3 v2)
     ]
     [(? d:expression?) (eval-exp mem env term)]
   )
