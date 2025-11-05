@@ -92,6 +92,31 @@
 
 ;; Exercise 3 (Manually graded)
 #|
-PLEASE REPLACE THIS TEXT BY YOUR ANSWER.
-YOU MAY USE MULTIPLE LINES.
+One difference between λD and Racket can be seen in the following example code:
+
+(define a 5)
+(define a 100)
+a
+
+In Racket, this program would give an error saying "identifier already defined". However, if we
+evaluate this code with λD using the following test case we get a different result:
+
+(eval-seq*?
+      ; Input memory
+      '[(E0)]
+      ; Environment
+      'E0
+      ; Input sequence
+      '[
+        (define a 5)
+        (define a 100)
+        a
+      ]
+      100
+      '[(E0 (a . 100))])
+
+The code evaluates the variable a to be 100. This is because in λD, we allow variables 
+to be overwritten. When variable a is put into the environment, it will overwrite whatever
+was previously set for variable a. However, Racket does not allow variables to be redefined.
+I used the above test case inside of the hw6-test.rkt file and confirmed the output and behavior.
 |#
