@@ -26,7 +26,22 @@
 ; Read the hints in the PDF.
 (: frame-refs (-> frame (Setof handle)))
 (define (frame-refs frm)
-  (error "todo")
+  ;; Get all values from frame.
+  (define values (frame-values frm))
+  ;; Get all closures by filtering out all other items from values
+  (define closures (filter d:closure? values))
+  ;; Get the handles by using map on the closures.
+  (define handles (map d:closure-env closures))
+
+  ;; Create final list for result by adding the parent frame handle if one is present.
+  (define result
+    (if (frame-parent frm)
+        (cons (frame-parent frm) handles)
+        handles)
+  )  
+
+  ;; Convert the list to a set.
+  (list->set result)
 )
 
 ;;;;;;;;;;;;;;;
