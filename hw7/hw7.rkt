@@ -91,7 +91,8 @@
   )
 )
 (define (mem-sweep mem to-keep)
-  (error "todo")
+  ;; Proc filter function checks if handle (key) is a member of set to-keep
+  (heap-filter (lambda (key value) (set-member? to-keep key)) mem)
 )
 
 ;;;;;;;;;;;;;;;
