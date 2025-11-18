@@ -33,14 +33,14 @@
   ;; Get the handles by using map on the closures.
   (define handles (map d:closure-env closures))
 
-  ;; Create final list for result by adding the parent frame handle if one is present.
+  ;; Create result list by adding the parent frame handle if one is present.
   (define result
     (if (frame-parent frm)
         (cons (frame-parent frm) handles)
         handles)
   )  
 
-  ;; Convert the list to a set.
+  ;; Convert the result list to a set.
   (list->set result)
 )
 
@@ -66,23 +66,29 @@
 )
 (define (mem-mark contained mem env)
 
-  ; (: mem-mark-iter (-> (Listof handle) (Setof handle) (Setof handle)))
+  (: mem-mark-iter (-> (Listof handle) (Setof handle) (Setof handle)))
   ; One solution to this problem is to loop while maintaining
   ; a list of environments to visit, and a set of elements visited
-  ; (define (mem-mark-iter to-visit visited)
-  ;   ; while not empty(to-visit):
-  ;   ;    1. pick one env from from to-visit and retrieve its "frame"
-  ;   ;    2. let "c" be the set of env's contained in the given "frame"
-  ;   ;    3. let the set "new" be every element that is in "c" but not in "visited" (use set-minus)
-  ;   ;    4. add every element of "new" to the rest of elements to be visited
-  ;   ;    5. update the set of visited elements to include the new elements
-  ;   (todo "todo")
-  ; )
-  ; ; run the loop with 1 element to visit, and 1 element visited
-  ; (mem-mark-iter (list env) (set env))
+  (define (mem-mark-iter to-visit visited)
+    (match to-visit
+      [(list) visited]  ;; If there are no more items to visit, return visited.
+      [(cons handle to-visit)
+        (define frame (heap-get mem handle))               ;; Get frame associated with handle.
+        (define c (contained frame))                       ;; Get references that the frame points to.
+        (define new (set->list (set-subtract c visited)))  ;; Removed visited from c and convert to list.
 
+        ;; Create a new list with updated nodes to visit by adding items in new.
+        (define updated-to-visit (append to-visit new))
+        ;; Create a new visited set by adding the handle we just visited.
+        (define updated-visited (set-add visited handle))
 
-  (error "todo")
+        ;; Call the iter function with updated to-visit and visited.
+        (mem-mark-iter updated-to-visit updated-visited)
+      ]
+    )
+  )
+  ; run the loop with 1 element to visit, and 1 element visited
+  (mem-mark-iter (list env) (set env))
 )
 
 ;;;;;;;;;;;;;;;
@@ -106,7 +112,8 @@
   )
 )
 (define (mem-sweep mem to-keep)
-  ;; Proc filter function checks if handle (key) is a member of set to-keep
+  ;; Lambda function checks if handle (key) is a member of set to-keep. 
+  ;; Heap-filter expects function to have two inputs (key value) even though only the key is needed.
   (heap-filter (lambda (key value) (set-member? to-keep key)) mem)
 )
 
