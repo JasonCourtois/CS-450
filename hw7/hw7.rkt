@@ -120,6 +120,21 @@
 ;;;;;;;;;;;;;;;
 ;; Exercise 4
 
+;; Testing by first creating iter-map - not used in solution for eff-map.
+(: iter-map (All [A B] (-> (-> A B) (Listof A) (Listof B))))
+(define (iter-map f l)
+  (: loop (-> (Listof B) (Listof A) (Listof B)))
+  (define (loop accum l)
+    (match l
+      [(list) (reverse accum)]
+      [(cons h l)
+        (loop (cons (f h) accum) l)
+      ]
+    )
+  )
+  (loop (list) l)
+)
+
 (: eff-map
   (All [State Input Output]
     (->
@@ -130,7 +145,23 @@
   )
 )
 (define (eff-map f l)
-  (error "todo")
+  (: loop 
+    (->
+      (Listof Output)
+      (Listof (eff-op State Input))
+      (eff-op State (Listof Output))
+    )
+  )
+  (define (loop accum l)
+    (match l
+      [(list) (eff-pure (reverse accum))] ;; Return when map has reached end of list and revers accum.
+      [(cons h l)
+        (eff-bind h
+          (lambda ([h-value : Input])
+            (loop (cons (f h-value) accum) l)))]  ;; Apply the function to h-value and add that to accum. Then call the loop again.
+    )
+  )
+  (loop (list) l) ;; Start iterative loop.
 )
 
 ;;;;;;;;;;;;;;;
