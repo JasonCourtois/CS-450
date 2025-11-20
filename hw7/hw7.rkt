@@ -215,6 +215,13 @@
 ;;;;;;;;;;;;;;;
 ;; Exercise 6 (MANUALLY GRADED)
 #|
-PLEASE REPLACE THIS TEXT BY YOU ANSWER.
-YOU MAY USE MULTIPLE LINES.
+When reference counting something in memory, 
+if the counter overflows to 0 the soundness would be impacted but not completeness.
+The soundness would be impacted because the data stored at this memory was still needed.
+We know that the data was still needed because the reference count should have been greater than 0.
+However, the completeness would not be affected. This is because setting the reference count to 0
+means that the memory will be released. Completeness only states that all unneeded data will eventually be reclaimed.
+Therefore reclaiming the memory prematurely does not impact completeness.
+
+Source: https://cogumbreiro.github.io/teaching/cs450/f23/lecture19.html#12
 |#
