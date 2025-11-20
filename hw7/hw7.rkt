@@ -167,6 +167,27 @@
 ;;;;;;;;;;;;;;;
 ;; Exercise 5
 
+(: exists?
+  (All [T]
+    (->
+      (-> T Boolean)
+      (Listof T)
+      Boolean
+    )
+  )
+)
+(define (exists? f l)
+  (match l
+    [(cons h l)
+      (cond 
+        [(f h) #t]
+        [else (exists? f l)])
+    ]
+    [(list) #f]
+  )
+)
+
+
 (: eff-exists?
   (All [State T]
     (->
@@ -177,7 +198,24 @@
   )
 )
 (define (eff-exists? f l)
-  (error "todo")
+  (match l
+    [(cons h l)
+      (cond 
+        [(f h) (eff-pure #t)]
+        [else 
+          (eff-bind h
+            (lambda ([h-value : T])
+              (eff-bind (eff-exists? f l)
+                (lambda ([result : (Listof T)])
+                  (eff-pure result)
+                )
+              )
+            )
+          )
+        ])
+    ]
+    [(list) (eff-pure #f)]
+  )
 )
 
 ;;;;;;;;;;;;;;;
