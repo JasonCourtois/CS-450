@@ -28,7 +28,7 @@
 (define (frame-refs frm)
   ;; Get all values from frame.
   (define values (frame-values frm))
-  ;; Get all closures by filtering out all other items from values
+  ;; Get all closures by filtering out all other items from values.
   (define closures (filter d:closure? values))
   ;; Get the handles by using map on the closures.
   (define handles (map d:closure-env closures))
@@ -144,6 +144,7 @@
     )
   )
 )
+
 (define (eff-map f l)
   (: loop 
     (->
@@ -154,11 +155,11 @@
   )
   (define (loop accum l)
     (match l
-      [(list) (eff-pure (reverse accum))] ;; Return when map has reached end of list and revers accum.
+      [(list) (eff-pure (reverse accum))] ;; Return when map has reached end of list and reverse the accumulator
       [(cons h l)
         (eff-bind h
           (lambda ([h-value : Input])
-            (loop (cons (f h-value) accum) l)))]  ;; Apply the function to h-value and add that to accum. Then call the loop again.
+            (loop (cons (f h-value) accum) l)))]  ;; Apply the function to h-value and add that to accumulator Then call the loop again.
     )
   )
   (loop (list) l) ;; Start iterative loop.
@@ -167,6 +168,7 @@
 ;;;;;;;;;;;;;;;
 ;; Exercise 5
 
+;; Basic version of exists we covered in class - use reference https://cogumbreiro.github.io/teaching/cs450/f23/lecture21.html#5 to convert to eff.
 (: exists?
   (All [T]
     (->
@@ -200,21 +202,13 @@
 (define (eff-exists? f l)
   (match l
     [(cons h l)
-      (cond 
-        [(f h) (eff-pure #t)]
-        [else 
-          (eff-bind h
-            (lambda ([h-value : T])
-              (eff-bind (eff-exists? f l)
-                (lambda ([result : (Listof T)])
-                  (eff-pure result)
-                )
-              )
-            )
-          )
-        ])
+      (eff-bind h
+        (lambda ([h-value : T]) : (eff-op State Boolean)  ;; Adding type to output was needed to satisfy typechecker.
+          (cond
+            [(f h-value) (eff-pure #t)] ;; If item was found, return true.
+            [else (eff-exists? f l)]))) ;; Otherwise search in the rest of the list.
     ]
-    [(list) (eff-pure #f)]
+    [(list) (eff-pure #f)]  ;; If list is empty, nothing was found.
   )
 )
 
