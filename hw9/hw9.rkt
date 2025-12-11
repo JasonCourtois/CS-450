@@ -44,24 +44,24 @@
         (mk-field y)  
       )
     ]
-    #|
     ; J[[x.y := e]]
-    [(... x y e)
+    [(s:assign x y e)
       ; let data = J[[e]] in
       (mk-let (translate e)
         (lambda (data)
           ;  let o = (deref J[[x]]) in
-          (mk-let ...
+          (mk-let (j:deref (translate x))
             (lambda (o)
               (j:seq
                 ; (set! J[[x]] (update-field o "y" data));
+                (j:assign (translate x) (j:set o (mk-field y) data))
                 ; data
+                data
               )
             )
           )
         )
       )
     ]
-    |#
   )
 )
