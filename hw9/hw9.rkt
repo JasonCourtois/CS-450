@@ -43,18 +43,18 @@
         (mk-field y)  
       )
     ]
-    ; J[[x.y := e]]
+    ;; J[[x.y := e]]
     [(s:assign x y e)
-      ; let data = J[[e]] in
+      ;; let data = J[[e]] in
       (mk-let (translate e)
         (lambda (data)
-          ;  let o = (deref J[[x]]) in
+          ;; let o = (deref J[[x]]) in
           (mk-let (j:deref (translate x))
             (lambda (o)
               (j:seq
-                ; (set! J[[x]] (update-field o "y" data));
+                ;; (set! J[[x]] (update-field o "y" data));
                 (j:assign (translate x) (j:set o (mk-field y) data))
-                ; data
+                ;; data
                 data
               )
             )
@@ -62,52 +62,52 @@
         )
       )
     ]
-    ; J[[x.y(e ···)]]]
+    ;; J[[x.y(e ···)]]]
     [(s:invoke x y e)
-      ; let m =(get-field (deref J[[x]])"y")in
+      ;; let m =(get-field (deref J[[x]])"y")in
       (mk-let (j:get (j:deref (translate x)) (mk-field y))
         (lambda (m)
-          ; let f =(get-field (deref m)"$code")in
+          ;; let f =(get-field (deref m)"$code")in
           (mk-let (j:get (j:deref m) (k:string "$code"))
             (lambda (f)
-              ; (f J[[x]]J[[e ···]]
+              ;; (f J[[x]]J[[e ···]]
               (j:apply f (cons (translate x) (map translate e)))
             )
           )
         )
       )
     ]
-    ; J[[function(x ···){e}]]
+    ;; J[[function(x ···){e}]]
     [(s:function x e)
       (mk-object
-        ; "$code" : λ(this, J[[x]]···).J[[e]]
+        ;; "$code" : λ(this, J[[x]]···).J[[e]]
         (cons "$code"
           (j:lambda
-            ; this parameter first, then translated parameters
+            ;; this parameter first, then translated parameters
             (cons (j:variable 'this) (map translate-var x))
-            ; translated body
+            ;; translated body
             (translate e)
           )
         )
-        ; "prototype" : (alloc {})
+        ;; "prototype" : (alloc {})
         (cons "prototype" (mk-object))
       )
     ]
-    ; J[[new ef(e ···)]]
+    ;; J[[new ef(e ···)]]
     [(s:new ef e)
-      ; let ctor =(deref J[[ef]])in
+      ;; let ctor =(deref J[[ef]])in
       (mk-let (j:deref (translate ef))
         (lambda (ctor)
-          ; let obj =(alloc {"$proto" :(get-field ctor "prototype")})in
+          ;; let obj =(alloc {"$proto" :(get-field ctor "prototype")})in
           (mk-let (mk-object (cons "$proto" (j:get ctor (k:string "prototype"))))
             (lambda (obj)
-              ; let f =(get-field ctor "$code")in
+              ;; let f =(get-field ctor "$code")in
               (mk-let (j:get ctor (k:string "$code"))
                 (lambda (f)
                   (j:seq
-                    ; (f obj J[[e]]···);
+                    ;; (f obj J[[e]]···);
                     (j:apply f (cons obj (map translate e)))
-                    ; obj
+                    ;; obj
                     obj
                   )
                 )
