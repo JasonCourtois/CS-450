@@ -34,7 +34,6 @@
      (j:let (j:variable x) (translate s1) (translate s2))]
     [(s:apply f ea) (j:apply (translate f) (map translate ea))
     ]
-    ;; TODO: write the missing cases
     ;; (get-field (deref J[[x]])"y")
     [(s:load x y)
       (j:get
